@@ -1,17 +1,60 @@
-export interface IOrderForm {
-  items: string[];
-  payment: string;
-  total: number;
-  address: string;
-  email: string;
-  phone: string;
+export type Category = 
+	'софт-скил' | 
+	'хард-скил' |
+	'кнопка' |
+	'другое'|
+	'дополнительное';
+
+export interface IProduct {
+	id: string;
+	name: string;
+	description: string;
+	icon: string;
+	cost: number | null;
+	category: Category;
+	inCart: boolean;
 }
 
-export interface IAppState {
-	catalog: IProduct[];
-	basket: string[];
-	preview: string;
-	order: IOrder;
+interface ICatalog {
+  items: IProduct[];
+}
+
+export interface ICart {
+	items: IProduct[];
+	totalCost: number;
+}
+
+interface IOrder extends IDeliveryForm, IContactForm {
+	cart: ICart;
+	total: number;
+}
+
+interface IAppState {
+	catalog: ICatalog;
+	cart: ICart;
+	delivery: IDeliveryForm | null;
+	contact: IContactForm | null;
+	order: IOrder | null;
+	clearCart(): void;
+	clearOrder(): void;
+	setCatalog(): void;
+	addToCart(): void;
+	removeFromCart(): void;
+	updateCart(): void;
+	takeDeliveryField(field: keyof IDeliveryForm, value: string): void;
+	takeContactField(field: keyof IContactForm, value: string): void;
+	validateDelivery(): boolean;
+	validateContact(): boolean;
+}
+
+interface IDeliveryForm {
+	payment: string;
+	address: string;
+}
+
+interface IContactForm {
+	email: string;
+	phone: string;
 }
 
 export interface IFormState {
@@ -19,56 +62,28 @@ export interface IFormState {
 	errors: string[];
 }
 
-export interface IProduct {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number;
+export interface IModal {
+  content: HTMLElement;
 }
 
-export interface IOrderForm {
-	payment: string;
-	address: string;
-	email: string;
-	phone: string;
+export type EventName = string | RegExp;
+
+export type Subscriber = Function;
+
+export type EmitterEvent = {
+	eventName: string,
+	data: unknown
+};
+
+
+
+export interface IEvents {
+	on<T extends object>(event: EventName, callback: (data: T) => void): void;
+	emit<T extends object>(event: string, data?: T): void;
+	trigger<T extends object>(event: string, context?: Partial<T>): (data: T) => void;
 }
 
-export interface IOrder {
-	total: number;
-	items: IOrderForm[];
-}
-
-export interface IOrderResult {
-	id: string;
-}
-
-export interface IPageView {
-	counter: number;
-	catalog: HTMLElement[];
-	loadProdusts(): void;
-	onClick(): void;
-}
-
-export interface ICardView {
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number;
-	onClick(): void;
-}
-
-export interface IBasketView {
-	products: HTMLElement[];
-	total: number;
-	deleteProduct(): void;
-	onClick(): void;
-}
-
-export interface IModalView {
-	content: HTMLElement;
-	open(): void;
-	close(): void;
-}
+export type ApiListResponse<Type> = {
+	total: number,
+	items: Type[]
+};
